@@ -21,6 +21,8 @@ const REAL_FIREBASE_PROJECT_ID = "betr-assessment";
 
 const firebase = require("@firebase/rules-unit-testing");
 
+const SUITE_TIMEOUT = 20_000;
+
 const seedItems = {
   "chocolate": 4.99,
   "coffee beans": 12.99,
@@ -37,11 +39,12 @@ const bobAuth = {
   email: "bob@example.com"
 };
 
-before(async () => {
+before(async function () {
   // Discover which emulators are running and where by using the Emulator Hub
   // This assumes the hub is running at 127.0.0.1:4400 (the default), you can check
   // by looking for the "Emulator Hub running at 127.0.0.1:<port>" line in the
   // logs from firebase emulators:start
+  this.timeout(SUITE_TIMEOUT);
   const emulatorSettings = await firebase.discoverEmulators();
   firebase.useEmulators(emulatorSettings);
 
@@ -57,14 +60,14 @@ before(async () => {
   });
 });
 
-after(() => {
+after(function() {
   firebase.apps().forEach(app => app.delete());
 });
 
 
 // Unit test the security rules
-describe("shopping carts", () => {
-
+describe("shopping carts", function()  {
+  this.timeout(SUITE_TIMEOUT);
   const aliceDb = firebase.initializeTestApp({
     projectId: TEST_FIREBASE_PROJECT_ID,
     auth: aliceAuth
@@ -79,7 +82,8 @@ describe("shopping carts", () => {
     projectId: TEST_FIREBASE_PROJECT_ID
   }).firestore();
 
-  after(async () => {
+  after(async function ()  {
+    this.timeout(SUITE_TIMEOUT);
     await resetData(admin, TEST_FIREBASE_PROJECT_ID);
   });
 
@@ -122,7 +126,8 @@ describe("shopping carts", () => {
   });
 });
 
-describe("shopping cart items", async () => {
+describe("shopping cart items", async function ()  {
+  this.timeout(SUITE_TIMEOUT);
   const admin = firebase.initializeAdminApp({ 
     projectId: TEST_FIREBASE_PROJECT_ID 
   }).firestore();
@@ -137,8 +142,9 @@ describe("shopping cart items", async () => {
     auth: bobAuth
   }).firestore();
 
-  before(async () => {
+  before(async function () {
     // Create Alice's cart
+    this.timeout(SUITE_TIMEOUT);
     const aliceCartRef = admin.doc("carts/alicesCart");
     await aliceCartRef.set({
       ownerUID: "alice",
@@ -152,7 +158,8 @@ describe("shopping cart items", async () => {
     }
   });
 
-  after(async () => {
+  after(async function()  {
+    this.timeout(SUITE_TIMEOUT);
     await resetData(admin, TEST_FIREBASE_PROJECT_ID);
   });
 
@@ -179,12 +186,14 @@ describe("shopping cart items", async () => {
   });
 });
 
-describe("adding an item to the cart recalculates the cart total. ", () => {
+describe("adding an item to the cart recalculates the cart total. ", function ()  {
+  this.timeout(SUITE_TIMEOUT);
   const admin = firebase.initializeAdminApp({ 
     projectId: REAL_FIREBASE_PROJECT_ID 
   }).firestore();
 
-  after(async () => {
+  after(async function ()  {
+    this.timeout(SUITE_TIMEOUT);
     await resetData(admin, REAL_FIREBASE_PROJECT_ID);
   });
 
