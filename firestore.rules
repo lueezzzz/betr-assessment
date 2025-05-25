@@ -11,7 +11,7 @@ service cloud.firestore {
     // Items inside the user's cart
     match /carts/{cartID}/items/{itemID} {
       // TODO: Change these! Anyone can read or write.
-      allow read, write: if false;
+      allow read, write: if get(/databases/$(database)/documents/carts/$(cartID)).data.ownerUID == request.auth.uid;
     }
 
     // All items available in the store. Users can read
